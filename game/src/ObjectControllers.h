@@ -18,7 +18,6 @@ public:
 		Vector2 dir{ 0, 0 };
 
 		if (mouseAction.IsActive()) {
-			Vector2 offset{ grid->tile_size / 2, grid->tile_size / 2 };
 			PathResult result = FindPathBFS(grid->PointToTilePos(objectTransform.position) , grid->PointToTilePos(mouseAction.position) , grid, objectHandler.Objects());
 
 			ac.path = result.path;
