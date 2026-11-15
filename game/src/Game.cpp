@@ -4,6 +4,7 @@
 Game::Game(int width, int height, const char* title)
 {
 	InitWindow(width, height, title);
+	ChangeDirectory(GetApplicationDirectory());
 	InitAudioDevice();
 	SetTargetFPS(60);
 }
