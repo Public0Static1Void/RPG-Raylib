@@ -4,6 +4,14 @@
 #include "Grid.h"
 #include "Assets.h"
 #include "CameraUtils.h"
+#include "Object.h"
+#include "ObjectHandler.h"
+#include "ObjectRenderer.h"
+#include "SoundManager.h"
+
+#include "ObjectControllers.h"
+
+#include "MouseActions.h"
 
 #include <raylib.h>
 #include <iostream>
@@ -25,11 +33,27 @@ public:
 
 		std::vector<Grid::ObjectPosition> positions = grid.GetStartPositions();
 
+		SpawnObjectsFromPositions(positions);
+
 		return true;
 	}
 
 	void Update(float deltaTime) override {
+		auto& objects = objectHandler.Objects();
 
+		MouseActions::Action mouseAction;
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+			Vector2 mouse_pos = GetScreenToWorld2D(GetMousePosition(), camera);
+			mouseAction = { mouse_pos, MouseActions::Type::MOVE };
+		}
+
+		for (auto& ob : objects) {
+			ob->Decide(player_ptr->objectTransform.position, objectHandler, mouseAction);
+			ob->Act(objects);
+			ob->UpdateMovement(deltaTime);
+		}
+
+		objectHandler.EndTurn();
 	}
 
 	void Render() override {
@@ -38,6 +62,8 @@ public:
 		BeginMode2D(camera);
 
 		grid.DrawGrid(assets);
+
+		ObjectRenderer::DrawAllObjects(objectHandler.Objects(), assets, grid);
 
 		EndMode2D();
 	}
@@ -55,4 +81,34 @@ private:
 	Assets assets;
 
 	Camera2D camera{};
+
+	Object* player_ptr;
+
+	ObjectHandler objectHandler;
+	SoundManager soundManager;
+
+	void SpawnObjectsFromPositions(std::vector<Grid::ObjectPosition>& positions) {
+		for (int i = 0; i < positions.size(); i++) {
+			Object* ob = nullptr;
+			switch (positions[i].type) {
+				case EntityType::PLAYER:
+				{
+					auto& player = objectHandler.Spawn<PlayerController>(&grid, 3);
+					player_ptr = &player; // Store the player ptr
+					ob = &player;
+					break;
+				}
+			}
+			if (ob != nullptr) {
+				if (!ob->on_move) ob->on_move = [this]() { soundManager.PlayStoredSound(SoundManager::SoundType::MOVE); };
+				if (!ob->on_rotate) ob->on_rotate = [this]() { soundManager.PlayStoredSound(SoundManager::SoundType::ROTATE); };
+				if (!ob->on_hit) ob->on_hit = [this]() { soundManager.PlayStoredSound(SoundManager::SoundType::HIT); };
+
+				if (ob->IsInteractabe()) ob->SetMoves(9);
+
+				ob->objectTransform.position = positions[i].position * grid.tile_size;
+				ob->objectTransform.size = Vector2{ static_cast<float>(grid.tile_size), static_cast<float>(grid.tile_size) };
+			}
+		}
+	}
 };

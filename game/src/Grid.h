@@ -46,6 +46,30 @@ public:
 			roundf(p.y / tile_size) * tile_size
 		};
 	}
+	static Vector2 SnapToTile(Vector2 p, float size) {
+		return {
+			roundf(p.x / size) * size,
+			roundf(p.y / size) * size
+		};
+	}
+
+	Vector2 PointToTilePos(Vector2 p) const {
+		const float lx = p.x - start_draw_position.x;
+		const float ly = p.y - start_draw_position.y;
+		return {
+			floorf(lx / tile_size) * tile_size,
+			floorf(ly / tile_size) * tile_size
+		};
+	}
+	Vector2 PointToTileCenter(Vector2 p) const {
+		const float lx = p.x - start_draw_position.x;
+		const float ly = p.y - start_draw_position.y;
+		const float offset = tile_size + tile_size * 0.5f;
+		return {
+			start_draw_position.x + floorf(lx / tile_size) * offset,
+			start_draw_position.y + floorf(ly / tile_size) * offset
+		};
+	}
 
 	bool IsWalkable(Vector2 position, bool terrestrial = true) {
 		int x = static_cast<int>(position.x / tile_size);
@@ -71,6 +95,7 @@ public:
 	int tile_size = 100;
 	std::vector<Vector2> path;
 	std::vector<Vector2> searched_tiles;
+	Vector2 start_position{}, end_position{};
 private:
 	Vector2 start_draw_position{ 0, 0 };
 

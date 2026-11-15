@@ -2,7 +2,9 @@ add_executable(rpg src/main.cpp
 	src/LevelScene.h
 	src/Game.cpp
 	src/Grid.cpp
-)
+	src/ObjectHandler.cpp
+	src/Pathfinding.cpp
+ "src/ObjectControllers.h" "src/MouseActions.h")
 
 target_link_libraries(rpg PRIVATE raylib)
 add_custom_command(TARGET rpg POST_BUILD

@@ -14,7 +14,7 @@ bool Grid::ScanLevel(const char* fileName)
 		return false;
 	}
 
-	// Ge tthe map characters
+	// Ge the map characters
 	tiles.clear();
 	string line;
 	while (std::getline(file, line)) {
@@ -111,12 +111,15 @@ void Grid::DrawGrid(const Assets& assets)
 		}
 		
 	}
-	/*
+	
 	for (auto& p : searched_tiles) {
 		DrawCircle(p.x + start_x, p.y + start_y, 3, GREEN);
 	}
 	for (auto& p : path) {
 		DrawCircle(p.x + start_x, p.y + start_y, 3, YELLOW);
 	}
-	*/
+
+	// Draw the start and end positions
+	DrawCircle(start_position.x + start_x, start_position.y + start_y, 6, BROWN);
+	DrawCircle(end_position.x + start_x, end_position.y + start_y, 6, RED);	
 }
