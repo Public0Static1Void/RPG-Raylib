@@ -26,6 +26,7 @@ FetchContent_Declare(doctest
     GIT_TAG v2.4.11
     GIT_SHALLOW TRUE)
 
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 FetchContent_MakeAvailable(raylib json doctest)
 
 enable_testing()
